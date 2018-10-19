@@ -21,10 +21,24 @@ Parameters:
       - ml.p3.2xlarge
     Description: Enter a valid SageMaker notebook instance type. Defaults to ml.p3.2xlarge.
 
+  NotificationEmail:
+    Type: "String"
+    AllowedPattern: "^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$"
+    Description: Enter a valid email address to get notified when the notebook instance is setup and ready for use.
+    ConstraintDescription: Must be a valid email address
+
 Conditions:
   LatestVersion: !Equals [ !Ref FastaiVersion, "1.0"]
 
 Resources:
+
+  NotebookEnvNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      Subscription:
+      - Endpoint: !Ref NotificationEmail
+        Protocol: email
+
   SageMakerIamRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -37,9 +51,19 @@ Resources:
               Service: sagemaker.amazonaws.com
             Action: sts:AssumeRole
       Path: "/"
+      Policies: 
+        - 
+          PolicyName: "root"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action: "sns:Publish"
+                Resource: !Ref NotebookEnvNotificationTopic      
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
-
+      
   NotebookLifecycleConfig:
     Type: "AWS::SageMaker::NotebookInstanceLifecycleConfig"
     Properties:
@@ -68,13 +92,15 @@ Resources:
               !Sub |            
                 #!/bin/bash
                 set -xe
-                echo "Chaning ownership of /home/ec2-user/anaconda3 directory to ec2-user"
+                echo "Changing ownership of /home/ec2-user/anaconda3 directory to ec2-user"
                 chown -R ec2-user:ec2-user /home/ec2-user/anaconda3
-                cat > /home/ec2-user/fastai-setup.sh <<\EOF
+                cat > /home/ec2-user/fastai-setup.sh <<\EOF1
                 #!/bin/bash
                 set -xe
-                instancetype=$(curl http://169.254.169.254/latest/meta-data/instance-type)
-                fastaiVersion="${FastaiVersion}" 
+                instancetype=$(curl -s http://169.254.169.254/latest/meta-data/instance-type)
+                fastaiVersion="${FastaiVersion}"
+                emailAddress="${NotificationEmail}"
+                snsTopic="${NotebookEnvNotificationTopic}"
                 if [[ "${!fastaiVersion}" == "0.7" ]] ; then  
                   echo "Setting up for fast.ai version 0.7"              
                   cd /home/ec2-user/SageMaker/fastai
@@ -100,8 +126,32 @@ Resources:
                   fi
                   conda install -y -n fastai -c fastai fastai
                 fi
-                echo "Finished creating fast.ai conda environment"                
-                EOF
+                echo "Finished creating fast.ai conda environment"    
+
+                echo "Getting the SageMaker notebook presigned URL"
+                nbname=$([ "${!fastaiVersion}" == "1.0" ] && echo "FastaiCourseV3Notebook" || echo "FastaiCourseV2Notebook")
+                echo "Notebook name is ${!nbname}"
+                longurl=$(aws sagemaker create-presigned-notebook-instance-url \
+                  --notebook-instance-name ${!nbname} \
+                  --region "${AWS::Region}" --output text --query "AuthorizedUrl")
+                echo "Long URL is ${!longurl}"
+
+                echo "Shortening URL"
+                url=$(curl -s http://tinyurl.com/api-create.php?url=${!longurl})
+                echo "Short URL is ${!url}"
+
+                cat > /tmp/message.txt <<EOF2
+                Your SageMaker notebook instance has the fastai conda enviornment setup correctly.
+
+                To access it, click on the following link: ${!url}
+                EOF2
+
+                echo "Sending SNS topic notification"
+                aws sns publish --topic-arn "${!snsTopic}" --subject "SageMaker Notebook instance now ready" \
+                  --region "${AWS::Region}" \
+                  --message file:///tmp/message.txt
+                echo "Finished setting up notebook instance"
+                EOF1
 
                 chown ec2-user:ec2-user /home/ec2-user/fastai-setup.sh
                 chmod 755 /home/ec2-user/fastai-setup.sh

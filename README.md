@@ -1,7 +1,7 @@
 # SageMaker fast.ai notebook
 Example project showing how to create a SageMaker notebook instance with the fast.ai library and course notebooks installed.
 
-The notebook is designed to work with either version 0.7 or version 1.0 of the fastai library. Version 0.7 should be used if are taking version 2 of the fast.ai Deep Learning for Coders MOOC class released online in early 2018. Version 1.0 should be selected if you are taking version 3 of the fast.ai Deep Learning for Coders MOOC class that will be released to the general public online early 2019.
+The notebook is designed to work with either [Version 0.7](https://github.com/fastai/fastai/tree/v0.7.2) or [version 1.0](https://github.com/fastai/fastai/tree/1.0.10) of the fastai library. **Version 0.7** should be used if you are taking [version 2](http://course.fast.ai) of the fastai course titled *Practical Deep Learning For Coders* released online in early 2018. **Version 1.0** should be selected if you are taking [version 3](https://www.usfca.edu/data-institute/certificates/deep-learning-part-one) of *Practical Deep Learning For Coders* that will be released to the general public in MOOC format in early 2019.
 
 ## Setup
 

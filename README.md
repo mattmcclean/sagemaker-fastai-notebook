@@ -1,7 +1,7 @@
 # SageMaker fast.ai notebook
 Example project showing how to create a SageMaker notebook instance with the fast.ai library and course notebooks installed.
 
-The notebook is designed to work with either [v 0.7](https://github.com/fastai/fastai/tree/v0.7.2) or [v 1.0](https://github.com/fastai/fastai/tree/1.0.10) of the fastai library. [v 0.7](https://github.com/fastai/fastai/tree/v0.7.2) should be used if you are taking [Practical Deep Learning For Coders v2](http://course.fast.ai) released online in early 2018. [v 1.0](https://github.com/fastai/fastai/tree/1.0.10) should be selected if you are taking [Practical Deep Learning For Coders v3](https://www.usfca.edu/data-institute/certificates/deep-learning-part-one) that will be released to the general public in MOOC format early 2019.
+The notebook is designed to work with either [v 0.7](https://github.com/fastai/fastai/tree/v0.7.2) or [v 1.0](https://github.com/fastai/fastai/) of the fastai library. [v 0.7](https://github.com/fastai/fastai/tree/v0.7.2) should be used if you are taking [2nd edition of Practical Deep Learning For Coders](http://course.fast.ai) released online in early 2018. [v 1.0](https://github.com/fastai/fastai/) should be selected if you are taking the [3rd edition of Practical Deep Learning For Coders](https://www.usfca.edu/data-institute/certificates/deep-learning-part-one) that will be released online to the general public early 2019.
 
 ## Setup
 
@@ -24,7 +24,7 @@ Region | Launch link
 
 Take note of the resources created including:
  - **IAM service role** allowing SageMaker access various AWS services
-  - **SageMaker Notebook Lifecycle Config** scripts that are run when the SageMaker Notebook is created and started.
+ - **SageMaker Notebook Lifecycle Config** scripts that are run when the SageMaker Notebook is created and started.
  - **SageMaker Notebook Instance** to run the fast.ai MOOC course notebooks.
  - **SNS Topic** to receive an email notification when the notebook is setup correctly with the fastai library and dependencies.
 
@@ -38,7 +38,7 @@ Take note of the resources created including:
 
 ![Screenshot](img/email_notification.png)
 
-4. Click on the tinyurl.com based shortened link  to open the Jupyter notebook console.
+4. Click on the tinyurl.com based shortened link to open the Jupyter notebook web console.
 
 ![Screenshot](img/jupyter_nb.png)
 

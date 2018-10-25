@@ -92,8 +92,6 @@ Resources:
               !Sub |            
                 #!/bin/bash
                 set -xe
-                echo "Changing ownership of /home/ec2-user/anaconda3 directory to ec2-user"
-                chown -R ec2-user:ec2-user /home/ec2-user/anaconda3
                 cat > /home/ec2-user/fastai-setup.sh <<\EOF1
                 #!/bin/bash
                 set -xe
@@ -114,17 +112,16 @@ Resources:
                   fi
                 else
                   echo "Setting up for fast.ai version 1.0" 
-                  conda create -y -n fastai python=3.7
                   if [[ "${!instancetype}" == p2* ]] || [[ "${!instancetype}" == p3* ]] ; then
                     echo "Installing GPU based PyTorch environment"
-                    conda install -y -n fastai -c pytorch pytorch-nightly cuda90
-                    conda install -y -n fastai -c fastai torchvision-nightly
+                    conda create -mqyp envs/fastai -c pytorch -c fastai python=3.7 pytorch-nightly fastai cuda90 torchvision-nightly
                   else
                     echo "Installing CPU based PyTorch environment"
-                    conda install -y -n fastai -c pytorch pytorch-nightly-cpu
-                    conda install -y -n fastai -c fastai torchvision-nightly-cpu
+                    conda create -mqyp envs/fastai -c pytorch -c fastai python=3.7 pytorch-nightly-cpu fastai torchvision-nightly-cpu
                   fi
-                  conda install -y -n fastai -c fastai fastai
+                  echo "Installing ipython kernel"
+                  source activate envs/fastai
+                  ipython kernel install --name 'fastai' --display-name 'Python 3' --user
                 fi
                 echo "Finished creating fast.ai conda environment"    
 

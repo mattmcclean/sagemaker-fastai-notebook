@@ -162,7 +162,7 @@ Resources:
                 ln -sf /home/ec2-user/SageMaker/.torch /home/ec2-user/.torch
                 ln -sf /home/ec2-user/SageMaker/.fastai /home/ec2-user/.fastai                    
                 echo "Creating fast.ai conda env in background process."
-                nohup /home/ec2-user/fastai-setup.sh &
+                nohup /home/ec2-user/SageMaker/fastai-setup.sh &
                 EOF
 
   SageMakerNotebookInstance:

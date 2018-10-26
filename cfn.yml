@@ -122,11 +122,11 @@ Resources:
                 cat > /tmp/message.txt <<EOF2
                 Your SageMaker notebook instance has the fastai conda enviornment setup correctly.
 
-                To access it, click on the following link: ${!url}
+                To access it, click on the following link: ${!url}. This link will be available for 12 hours only.
                 EOF2
 
                 echo "Sending SNS topic notification"
-                aws sns publish --topic-arn "${!snsTopic}" --subject "SageMaker Notebook instance now ready" \
+                aws sns publish --topic-arn "${!snsTopic}" --subject "SageMaker Notebook instance now ready to use" \
                   --region "${AWS::Region}" \
                   --message file:///tmp/message.txt
                 echo "Finished setting up notebook instance"
@@ -145,11 +145,10 @@ Resources:
                 fi
                 EOF
 
-                chown ec2-user:ec2-user /home/ec2-user/SageMaker/fastai-setup.sh
-                chmod 755 /home/ec2-user/SageMaker/fastai-setup.sh  
+                chown ec2-user:ec2-user /home/ec2-user/SageMaker/fastai-setup.sh && chmod 755 /home/ec2-user/SageMaker/fastai-setup.sh                  
 
-                mkdir -p /home/ec2-user/SageMaker/.torch  
-                mkdir -p /home/ec2-user/SageMaker/.fastai     
+                mkdir -p /home/ec2-user/SageMaker/.torch && chown -R ec2-user:ec2-user /home/ec2-user/.torch 
+                mkdir -p /home/ec2-user/SageMaker/.fastai && chown -R ec2-user:ec2-user /home/ec2-user/.fastai    
 
       OnStart:
         - Content:

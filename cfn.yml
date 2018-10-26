@@ -105,15 +105,14 @@ Resources:
                       conda create -mqyp ~/SageMaker/envs/fastai -c pytorch -c fastai python=3.7 pytorch-nightly-cpu fastai torchvision-nightly-cpu
                     fi
                     echo "Finished creating fast.ai conda environment"
+                    echo "Cleanup conda files"
+                    conda clean -qya                    
                   else
                     firstRun=false
                   fi
                   echo "Installing ipython kernel"
                   source activate ~/SageMaker/envs/fastai
                   ipython kernel install --name 'fastai' --display-name 'fastai' --user
-                  source deactivate
-                  echo "Cleanup conda files"
-                  conda clean -qya
                 fi
                   
                 if [ "${!firstRun}" = true ]; then                

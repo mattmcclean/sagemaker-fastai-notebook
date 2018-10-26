@@ -1,4 +1,4 @@
-Description: "Creates resources to run the fast.ai course on a SageMaker notebook instance. Works for both v0.7 and v1.0 of the fast.ai library."
+Description: "Creates resources (SageMaker Notebook, IAM role, SNS topic) to run the fast.ai course on a SageMaker notebook instance. Works for both v0.7 and v1.0 of the fast.ai library."
 Parameters:
 
   FastaiVersion:
@@ -81,6 +81,7 @@ Resources:
                 fastaiVersion="${FastaiVersion}"
                 emailAddress="${NotificationEmail}"
                 snsTopic="${NotebookEnvNotificationTopic}"
+                firstRun=true
                 if [[ "${!fastaiVersion}" == "0.7" ]] ; then  
                   echo "Setting up for fast.ai version 0.7"              
                   cd /home/ec2-user/SageMaker/fastai
@@ -93,42 +94,52 @@ Resources:
                     conda env create -f environment-cpu.yml
                   fi
                 else
-                  echo "Setting up for fast.ai version 1.0" 
-                  if [[ "${!instancetype}" == p2* ]] || [[ "${!instancetype}" == p3* ]] ; then
-                    echo "Installing GPU based PyTorch environment"
-                    conda create -mqy -n fastai -p envs/fastai -c pytorch -c fastai python=3.7 pytorch-nightly fastai cuda90 torchvision-nightly
+                  echo "Setting up for fast.ai version 1.0"
+                  if [ ! -d /home/ec2-user/SageMaker/envs/fastai ]; then
+                    echo "Creating conda environment"
+                    if [[ "${!instancetype}" == p2* ]] || [[ "${!instancetype}" == p3* ]] ; then
+                      echo "Installing GPU based PyTorch environment"
+                      conda create -mqyp ~/SageMaker/envs/fastai -c pytorch -c fastai python=3.7 pytorch-nightly fastai cuda90 torchvision-nightly
+                    else
+                      echo "Installing CPU based PyTorch environment"
+                      conda create -mqyp ~/SageMaker/envs/fastai -c pytorch -c fastai python=3.7 pytorch-nightly-cpu fastai torchvision-nightly-cpu
+                    fi
+                    echo "Finished creating fast.ai conda environment"
                   else
-                    echo "Installing CPU based PyTorch environment"
-                    conda create -mqy -n fastai -p envs/fastai -c pytorch -c fastai python=3.7 pytorch-nightly-cpu fastai torchvision-nightly-cpu
+                    firstRun=false
                   fi
                   echo "Installing ipython kernel"
-                  source activate envs/fastai
-                  ipython kernel install --name 'fastai' --display-name 'Python 3' --user
+                  source activate ~/SageMaker/envs/fastai
+                  ipython kernel install --name 'fastai' --display-name 'fastai' --user
+                  source deactivate
+                  echo "Cleanup conda files"
+                  conda clean -qya
                 fi
-                echo "Finished creating fast.ai conda environment"    
+                  
+                if [ "${!firstRun}" = true ]; then                
+                  echo "Getting the SageMaker notebook presigned URL"
+                  nbname=$([ "${!fastaiVersion}" == "1.0" ] && echo "FastaiCourseV3Notebook" || echo "FastaiCourseV2Notebook")
+                  echo "Notebook name is ${!nbname}"
+                  longurl=$(aws sagemaker create-presigned-notebook-instance-url \
+                    --notebook-instance-name ${!nbname} \
+                    --region "${AWS::Region}" --output text --query "AuthorizedUrl")
+                  echo "Long URL is ${!longurl}"
 
-                echo "Getting the SageMaker notebook presigned URL"
-                nbname=$([ "${!fastaiVersion}" == "1.0" ] && echo "FastaiCourseV3Notebook" || echo "FastaiCourseV2Notebook")
-                echo "Notebook name is ${!nbname}"
-                longurl=$(aws sagemaker create-presigned-notebook-instance-url \
-                  --notebook-instance-name ${!nbname} \
-                  --region "${AWS::Region}" --output text --query "AuthorizedUrl")
-                echo "Long URL is ${!longurl}"
-
-                echo "Shortening URL"
-                url=$(curl -s http://tinyurl.com/api-create.php?url=${!longurl})
-                echo "Short URL is ${!url}"
+                  echo "Shortening URL"
+                  url=$(curl -s http://tinyurl.com/api-create.php?url=${!longurl})
+                  echo "Short URL is ${!url}"
 
                 cat > /tmp/message.txt <<EOF2
                 Your SageMaker notebook instance has the fastai conda enviornment setup correctly.
 
                 To access it, click on the following link: ${!url}. This link will be available for 12 hours only.
                 EOF2
-
-                echo "Sending SNS topic notification"
-                aws sns publish --topic-arn "${!snsTopic}" --subject "SageMaker Notebook instance now ready to use" \
-                  --region "${AWS::Region}" \
-                  --message file:///tmp/message.txt
+                
+                  echo "Sending SNS topic notification"
+                  aws sns publish --topic-arn "${!snsTopic}" --subject "SageMaker Notebook instance now ready to use" \
+                    --region "${AWS::Region}" \
+                    --message file:///tmp/message.txt                  
+                fi
                 echo "Finished setting up notebook instance"
                 EOF1
 
@@ -155,12 +166,12 @@ Resources:
                 #!/bin/bash
                 set -xe
                 sudo -i -u ec2-user bash << EOF
-                [ -d /home/ec2-user/SageMaker/.torch ] && echo ".torch dir already exists." || mkdir /home/ec2-user/SageMaker/.torch
-                [ -d /home/ec2-user/SageMaker/.fastai ] && echo ".fastai dir already exists." || mkdir /home/ec2-user/SageMaker/.fastai
+                #[ -d /home/ec2-user/SageMaker/.torch ] && echo ".torch dir already exists." || mkdir /home/ec2-user/SageMaker/.torch
+                #[ -d /home/ec2-user/SageMaker/.fastai ] && echo ".fastai dir already exists." || mkdir /home/ec2-user/SageMaker/.fastai
 
-                echo "Creating soft links"
-                ln -sf /home/ec2-user/SageMaker/.torch /home/ec2-user/.torch
-                ln -sf /home/ec2-user/SageMaker/.fastai /home/ec2-user/.fastai
+                #echo "Creating soft links"
+                #ln -sf /home/ec2-user/SageMaker/.torch /home/ec2-user/.torch
+                #ln -sf /home/ec2-user/SageMaker/.fastai /home/ec2-user/.fastai
                             
                 echo "Creating fast.ai conda env in background process."
                 nohup /home/ec2-user/SageMaker/fastai-setup.sh &

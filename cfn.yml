@@ -1,11 +1,11 @@
-Description: "Creates resources to run the fast.ai MOOC on a SageMaker notebook instance"
+Description: "Creates resources to run the fast.ai course on a SageMaker notebook instance. Works for both v0.7 and v1.0 of the fast.ai library."
 Parameters:
 
   FastaiVersion:
     Type: "String"
     Default: "1.0"
     AllowedValues: [ "0.7", "1.0" ]
-    Description: "Enter the value of the fast.ai library version (0.7 or 1.0). Default is 0.7"
+    Description: "Enter the value of the fast.ai library version (0.7 or 1.0). Default is 1.0"
 
   NotebookInstanceType:
     Type: "String"

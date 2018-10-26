@@ -96,10 +96,10 @@ Resources:
                   echo "Setting up for fast.ai version 1.0" 
                   if [[ "${!instancetype}" == p2* ]] || [[ "${!instancetype}" == p3* ]] ; then
                     echo "Installing GPU based PyTorch environment"
-                    conda create -mqyp envs/fastai -c pytorch -c fastai python=3.7 pytorch-nightly fastai cuda90 torchvision-nightly
+                    conda create -mqy -n fastai -p envs/fastai -c pytorch -c fastai python=3.7 pytorch-nightly fastai cuda90 torchvision-nightly
                   else
                     echo "Installing CPU based PyTorch environment"
-                    conda create -mqyp envs/fastai -c pytorch -c fastai python=3.7 pytorch-nightly-cpu fastai torchvision-nightly-cpu
+                    conda create -mqy -n fastai -p envs/fastai -c pytorch -c fastai python=3.7 pytorch-nightly-cpu fastai torchvision-nightly-cpu
                   fi
                   echo "Installing ipython kernel"
                   source activate envs/fastai
@@ -132,7 +132,8 @@ Resources:
                 echo "Finished setting up notebook instance"
                 EOF1
 
-                chown ec2-user:ec2-user /home/ec2-user/SageMaker/fastai-setup.sh && chmod 755 /home/ec2-user/SageMaker/fastai-setup.sh 
+                chown ec2-user:ec2-user /home/ec2-user/SageMaker/fastai-setup.sh
+                chmod 755 /home/ec2-user/SageMaker/fastai-setup.sh 
 
                 sudo -i -u ec2-user bash <<\EOF
                 fastaiVersion="${FastaiVersion}"
@@ -145,11 +146,8 @@ Resources:
                   echo "Clone fast.ai for v3 course"
                   git clone https://github.com/fastai/course-v3 /home/ec2-user/SageMaker/fastai-course-v3
                 fi
-
-                mkdir -p /home/ec2-user/SageMaker/.torch
-                mkdir -p /home/ec2-user/SageMaker/.fastai
-                EOF                              
-
+                EOF
+                
       OnStart:
         - Content:
             Fn::Base64:
@@ -157,9 +155,13 @@ Resources:
                 #!/bin/bash
                 set -xe
                 sudo -i -u ec2-user bash << EOF
+                [ -d /home/ec2-user/SageMaker/.torch ] && echo ".torch dir already exists." || mkdir /home/ec2-user/SageMaker/.torch
+                [ -d /home/ec2-user/SageMaker/.fastai ] && echo ".fastai dir already exists." || mkdir /home/ec2-user/SageMaker/.fastai
+
                 echo "Creating soft links"
                 ln -sf /home/ec2-user/SageMaker/.torch /home/ec2-user/.torch
-                ln -sf /home/ec2-user/SageMaker/.fastai /home/ec2-user/.fastai                    
+                ln -sf /home/ec2-user/SageMaker/.fastai /home/ec2-user/.fastai
+                            
                 echo "Creating fast.ai conda env in background process."
                 nohup /home/ec2-user/SageMaker/fastai-setup.sh &
                 EOF

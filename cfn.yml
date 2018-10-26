@@ -73,26 +73,8 @@ Resources:
               !Sub |
                 #!/bin/bash
                 set -xe
-                sudo -i -u ec2-user bash <<\EOF
-                fastaiVersion="${FastaiVersion}"
-                if [[ "${!fastaiVersion}" == "0.7" ]]; then
-                  echo "Clone fast.ai for v2 course"
-                  git clone https://github.com/fastai/fastai /home/ec2-user/SageMaker/fastai
-                  mkdir /home/ec2-user/SageMaker/fastai/courses/dl1/data
-                  ln -s /home/ec2-user/SageMaker/fastai/courses /home/ec2-user/SageMaker/fastai-course-v2
-                else
-                  echo "Clone fast.ai for v3 course"
-                  git clone https://github.com/fastai/course-v3 /home/ec2-user/SageMaker/fastai-course-v3
-                fi
-                EOF
 
-      OnStart:
-        - Content:
-            Fn::Base64:
-              !Sub |            
-                #!/bin/bash
-                set -xe
-                cat > /home/ec2-user/fastai-setup.sh <<\EOF1
+                cat > /home/ec2-user/SageMaker/fastai-setup.sh <<\EOF1
                 #!/bin/bash
                 set -xe
                 instancetype=$(curl -s http://169.254.169.254/latest/meta-data/instance-type)
@@ -150,10 +132,35 @@ Resources:
                 echo "Finished setting up notebook instance"
                 EOF1
 
-                chown ec2-user:ec2-user /home/ec2-user/fastai-setup.sh
-                chmod 755 /home/ec2-user/fastai-setup.sh
+                sudo -i -u ec2-user bash <<\EOF
+                fastaiVersion="${FastaiVersion}"
+                if [[ "${!fastaiVersion}" == "0.7" ]]; then
+                  echo "Clone fast.ai for v2 course"
+                  git clone https://github.com/fastai/fastai /home/ec2-user/SageMaker/fastai
+                  mkdir /home/ec2-user/SageMaker/fastai/courses/dl1/data
+                  ln -s /home/ec2-user/SageMaker/fastai/courses /home/ec2-user/SageMaker/fastai-course-v2
+                else
+                  echo "Clone fast.ai for v3 course"
+                  git clone https://github.com/fastai/course-v3 /home/ec2-user/SageMaker/fastai-course-v3
+                fi
+                EOF
 
+                chown ec2-user:ec2-user /home/ec2-user/SageMaker/fastai-setup.sh
+                chmod 755 /home/ec2-user/SageMaker/fastai-setup.sh  
+
+                mkdir -p /home/ec2-user/SageMaker/.torch  
+                mkdir -p /home/ec2-user/SageMaker/.fastai     
+
+      OnStart:
+        - Content:
+            Fn::Base64:
+              !Sub |            
+                #!/bin/bash
+                set -xe
                 sudo -i -u ec2-user bash << EOF
+                echo "Creating soft links"
+                ln -sf /home/ec2-user/SageMaker/.torch /home/ec2-user/.torch
+                ln -sf /home/ec2-user/SageMaker/.fastai /home/ec2-user/.fastai                    
                 echo "Creating fast.ai conda env in background process."
                 nohup /home/ec2-user/fastai-setup.sh &
                 EOF

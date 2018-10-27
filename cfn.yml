@@ -9,7 +9,7 @@ Parameters:
 
   NotebookInstanceType:
     Type: "String"
-    Default: ml.p3.2xlarge
+    Default: ml.p2.xlarge
     AllowedValues:
       - ml.t2.medium
       - ml.t2.large
@@ -19,7 +19,7 @@ Parameters:
       - ml.m4.2xlarge
       - ml.p2.xlarge
       - ml.p3.2xlarge
-    Description: Enter a valid SageMaker notebook instance type. Defaults to ml.p3.2xlarge.
+    Description: Enter a valid SageMaker notebook instance type. Defaults to ml.p2.xlarge.
 
   NotificationEmail:
     Type: "String"

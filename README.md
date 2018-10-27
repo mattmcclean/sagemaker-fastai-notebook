@@ -9,7 +9,7 @@ Follow the instructions below to setup your IAM role, SageMaker Notebook Lifecyc
 
 We will use [CloudFormation](https://aws.amazon.com/cloudformation/) to create our resources via a template file. To do this,
 
-1. Click the **Launch Template** button in the table below selecting the  region closest to you. It will  open the AWS CloudFormation Web Console a create a new CloudFormation stack. There are a few parameters you will need to fill in including the instance type, fastai library version and email address. The default instance type is **ml.p2.xlarge** as this is required to train the fast.ai models quickly. The **ml.t2.medium** option is part of the AWS Free Tier. See the SageMaker [pricing page](https://aws.amazon.com/sagemaker/pricing/) for more details. Valid options are for the fast.ai library are **0.7** and **1.0**. The default option is **1.0**. You will need to enter your email address to receive a notification when the fastai environment has been installed correctly. Click through the options and select the SageMaker instance type, the fastai library version and your email address.
+1. Click the **Launch Template** button in the table below selecting the  region closest to you. It will  open the AWS CloudFormation Web Console a create a new CloudFormation stack. 
 
 Region | Name | Launch link
 --- | --- | ---
@@ -21,6 +21,12 @@ Asia Pacific (Seoul) Region | ap-northeast-2 | [![CloudFormation](img/cfn-launch
 Asia Pacific (Sydney) Region | ap-southeast-2 | [![CloudFormation](img/cfn-launch-stack.png)](https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/create/review?filter=active&templateURL=https%3A%2F%2Fs3-eu-west-1.amazonaws.com%2Fmmcclean-public-files%2Fsagemaker-fastai-notebook%2Fcfn.yml&stackName=FastaiSageMakerNbStack)
 EU (Ireland) Region | eu-west-1 | [![CloudFormation](img/cfn-launch-stack.png)](https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/create/review?filter=active&templateURL=https%3A%2F%2Fs3-eu-west-1.amazonaws.com%2Fmmcclean-public-files%2Fsagemaker-fastai-notebook%2Fcfn.yml&stackName=FastaiSageMakerNbStack)
 EU (Frankfurt) Region | eu-central-1 | [![CloudFormation](img/cfn-launch-stack.png)](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/create/review?filter=active&templateURL=https%3A%2F%2Fs3-eu-west-1.amazonaws.com%2Fmmcclean-public-files%2Fsagemaker-fastai-notebook%2Fcfn.yml&stackName=FastaiSageMakerNbStack)
+
+2. There are a few parameters you will need to fill in including the instance type, fastai library version and email address. The default instance type is **ml.p2.xlarge** as this is required to train the fast.ai models quickly. The **ml.t2.medium** option is part of the AWS Free Tier. See the SageMaker [pricing page](https://aws.amazon.com/sagemaker/pricing/) for more details. Valid options are for the fast.ai library are **0.7** and **1.0**. The default option is **1.0**. You will need to enter your email address to receive a notification when the fastai environment has been installed correctly. Tick the option box to acknowledge that IAM resources will be created and then click the *Create* button to create the stack.
+
+![Screenshot](img/cfn_create_stack.png)
+
+You will now see a CloudFormation create stack screenshot like the one shown below:
 
 ![Screenshot](img/cfn_stack_detail_in_progress.png)
 

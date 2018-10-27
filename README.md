@@ -40,15 +40,15 @@ About 5 minutes or so should pass then the CloudFormation stack should move to t
 
 ![Screenshot](img/cfn_stack_detail_complete.png)
 
-2. You will need to confirm the subscription to the SNS topic by checking the inbox of the email address supplied. Click the **Confirm subscription** link in the email to receive the notification email later.
+3. You will need to confirm the subscription to the SNS topic by checking the inbox of the email address supplied. Click the **Confirm subscription** link in the email to receive the notification email later.
 
 ![Screenshot](img/confirm_sub.png)
 
-3. Wait for up to 15 minutes to have all of the fastai libraries installed on the SageMaker notebook instance. When it has done you will receive an email with a link to the notebook instance as per the screenshot below. 
+4. Wait for up to 15 minutes to have all of the fastai libraries installed on the SageMaker notebook instance. When it has done you will receive an email with a link to the notebook instance as per the screenshot below. 
 
 ![Screenshot](img/email_notification_ready.png)
 
-4. Click on the tinyurl.com based shortened link to open the Jupyter notebook web console.
+5. Click on the tinyurl.com based shortened link to open the Jupyter notebook web console.
 
 ![Screenshot](img/jupyter_nb.png)
 

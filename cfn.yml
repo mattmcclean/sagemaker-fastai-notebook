@@ -72,11 +72,11 @@ Resources:
             Fn::Base64: 
               !Sub |
                 #!/bin/bash
-                set -xe
+                set -e
 
                 cat > /home/ec2-user/SageMaker/fastai-setup.sh <<\EOF1
                 #!/bin/bash
-                set -xe
+                set -e
                 instancetype=$(curl -s http://169.254.169.254/latest/meta-data/instance-type)
                 fastaiVersion="${FastaiVersion}"
                 emailAddress="${NotificationEmail}"
@@ -109,6 +109,9 @@ Resources:
                     conda clean -qya                    
                   else
                     firstRun=false
+                    echo "Updating the fastai library"
+                    source activate ~/SageMaker/envs/fastai
+                    conda update -y fastai
                   fi
                   echo "Installing ipython kernel"
                   source activate ~/SageMaker/envs/fastai
@@ -163,17 +166,22 @@ Resources:
             Fn::Base64:
               !Sub |            
                 #!/bin/bash
-                set -xe
+                set -e
                 sudo -i -u ec2-user bash << EOF
-                #[ -d /home/ec2-user/SageMaker/.torch ] && echo ".torch dir already exists." || mkdir /home/ec2-user/SageMaker/.torch
-                #[ -d /home/ec2-user/SageMaker/.fastai ] && echo ".fastai dir already exists." || mkdir /home/ec2-user/SageMaker/.fastai
+                [ -d /home/ec2-user/SageMaker/.torch ] && echo ".torch dir already exists." || mkdir /home/ec2-user/SageMaker/.torch
+                [ -d /home/ec2-user/SageMaker/.fastai ] && echo ".fastai dir already exists." || mkdir /home/ec2-user/SageMaker/.fastai
 
                 #echo "Creating soft links"
                 #ln -sf /home/ec2-user/SageMaker/.torch /home/ec2-user/.torch
                 #ln -sf /home/ec2-user/SageMaker/.fastai /home/ec2-user/.fastai
                             
-                echo "Creating fast.ai conda env in background process."
+                echo "Setting up fast.ai enviornment in background process."
                 nohup /home/ec2-user/SageMaker/fastai-setup.sh &
+
+                set +e
+                echo "Updating the fastai course repo"
+                cd ~/SageMaker/course-v3
+                git pull
                 EOF
 
   SageMakerNotebookInstance:

@@ -120,10 +120,8 @@ Resources:
                   
                 if [ "${!firstRun}" = true ]; then                
                   echo "Getting the SageMaker notebook presigned URL"
-                  nbname=$([ "${!fastaiVersion}" == "1.0" ] && echo "FastaiCourseV3Notebook" || echo "FastaiCourseV2Notebook")
-                  echo "Notebook name is ${!nbname}"
                   longurl=$(aws sagemaker create-presigned-notebook-instance-url \
-                    --notebook-instance-name ${!nbname} \
+                    --notebook-instance-name "fastai" \
                     --region "${AWS::Region}" --output text --query "AuthorizedUrl")
                   echo "Long URL is ${!longurl}"
 
@@ -187,7 +185,7 @@ Resources:
   SageMakerNotebookInstance:
     Type: "AWS::SageMaker::NotebookInstance"
     Properties:
-      NotebookInstanceName: !If [LatestVersion, "FastaiCourseV3Notebook", "FastaiCourseV2Notebook"]
+      NotebookInstanceName: "fastai"
       InstanceType: !Ref NotebookInstanceType
       RoleArn: !GetAtt SageMakerIamRole.Arn
       LifecycleConfigName: !GetAtt NotebookLifecycleConfig.NotebookInstanceLifecycleConfigName

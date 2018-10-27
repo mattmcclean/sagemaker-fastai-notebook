@@ -112,7 +112,7 @@ Resources:
                   fi
                   echo "Installing ipython kernel"
                   source activate ~/SageMaker/envs/fastai
-                  ipython kernel install --name 'fastai' --display-name 'fastai' --user
+                  ipython kernel install --name 'fastai' --display-name 'Python 3' --user
                 fi
                   
                 if [ "${!firstRun}" = true ]; then                
@@ -151,10 +151,10 @@ Resources:
                   echo "Clone fast.ai for v2 course"
                   git clone https://github.com/fastai/fastai /home/ec2-user/SageMaker/fastai
                   mkdir /home/ec2-user/SageMaker/fastai/courses/dl1/data
-                  ln -s /home/ec2-user/SageMaker/fastai/courses /home/ec2-user/SageMaker/fastai-course-v2
+                  ln -s /home/ec2-user/SageMaker/fastai/courses /home/ec2-user/SageMaker/course-v2
                 else
                   echo "Clone fast.ai for v3 course"
-                  git clone https://github.com/fastai/course-v3 /home/ec2-user/SageMaker/fastai-course-v3
+                  git clone https://github.com/fastai/course-v3 /home/ec2-user/SageMaker/course-v3
                 fi
                 EOF
                 

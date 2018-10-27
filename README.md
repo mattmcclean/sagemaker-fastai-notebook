@@ -22,13 +22,17 @@ Asia Pacific (Sydney) Region | ap-southeast-2 | [![CloudFormation](img/cfn-launc
 EU (Ireland) Region | eu-west-1 | [![CloudFormation](img/cfn-launch-stack.png)](https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/create/review?filter=active&templateURL=https%3A%2F%2Fs3-eu-west-1.amazonaws.com%2Fmmcclean-public-files%2Fsagemaker-fastai-notebook%2Fcfn.yml&stackName=FastaiSageMakerNbStack)
 EU (Frankfurt) Region | eu-central-1 | [![CloudFormation](img/cfn-launch-stack.png)](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/create/review?filter=active&templateURL=https%3A%2F%2Fs3-eu-west-1.amazonaws.com%2Fmmcclean-public-files%2Fsagemaker-fastai-notebook%2Fcfn.yml&stackName=FastaiSageMakerNbStack)
 
-Take note of the resources created including:
+![Screenshot](img/cfn_stack_detail_in_progress.png)
+
+Take note of the resources being created including:
  - **IAM service role** allowing SageMaker access various AWS services
  - **SageMaker Notebook Lifecycle Config** scripts that are run when the SageMaker Notebook is created and started.
  - **SageMaker Notebook Instance** to run the fast.ai MOOC course notebooks.
  - **SNS Topic** to receive an email notification when the notebook is setup correctly with the fastai library and dependencies.
 
-![Screenshot](img/cfn_stack_output.png)
+About 5 minutes or so should pass then the CloudFormation stack should move to the state *CREATE_COMPLETE* like the screenshot below.
+
+![Screenshot](img/cfn_stack_detail_complete.png)
 
 2. You will need to confirm the subscription to the SNS topic by checking the inbox of the email address supplied. Click the **Confirm subscription** link in the email to receive the notification email later.
 
